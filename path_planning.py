@@ -48,5 +48,5 @@ cal_arlo.follow_path(smoothed_path)
 if path is None:
     print("Cannot find path")
 else:
-    rrt.draw_graph(smoothed_path, name = "smooth")
+    rrt.draw_graph(smoothed_path, name = "1")
     print("found path")
