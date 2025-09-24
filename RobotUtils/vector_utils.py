@@ -1,6 +1,7 @@
 import numpy as np
 
 class VectorUtils:
+    @staticmethod
     def rotate_vector(v, angle):
         """Rotate 2D vector v by angle (radians)"""
         c, s = np.cos(angle), np.sin(angle)
