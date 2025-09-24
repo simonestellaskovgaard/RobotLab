@@ -34,7 +34,7 @@ rrt = robot_RRT(
     path_resolution=path_res,
     )
 
-path, distances  =rrt.planning()
+path =rrt.planning()
 
 
 if path is None:
@@ -45,6 +45,6 @@ else:
     print(f"path: {path}")
 
     print(f"Smoothedpath: {smoothed_path}")
-    cal_arlo.follow_path(smoothed_path, distances)
+    cal_arlo.follow_path(smoothed_path)
     rrt.draw_graph(smoothed_path, name = "1")
     print("found path")
