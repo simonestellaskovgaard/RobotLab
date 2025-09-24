@@ -42,7 +42,7 @@ def drive_to_landmark():
             time.sleep(0.2)
 
 def drive_to_landmark_steps():
-    step_distance = 0.2
+    step_distance = 0.4
     while True:
         frame = cam.get_frame()
         corners, ids = aruco.detect_markers(frame)
