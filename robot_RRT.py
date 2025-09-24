@@ -160,7 +160,7 @@ class robot_RRT:
             rnd = self.Node(self.end.pos)
         return rnd
 
-    def draw_graph(self, path_todraw, name = None):
+    def draw_graph(self, path, name = None):
         # draw the map
         self.map.draw_map()
 
