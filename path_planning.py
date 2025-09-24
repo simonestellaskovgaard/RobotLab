@@ -34,7 +34,7 @@ rrt = robot_RRT(
 
 path =rrt.planning()
 
-rrt.draw_graph()
+rrt.draw_graph(path)
 
 if path is None:
     print("Cannot find path")

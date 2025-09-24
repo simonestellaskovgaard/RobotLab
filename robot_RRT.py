@@ -127,12 +127,11 @@ class robot_RRT:
             rnd = self.Node(self.end.pos)
         return rnd
 
-    def draw_graph(self, rnd=None):
+    def draw_graph(self, path):
         # draw the map
         self.map.draw_map()
 
-        for node in self.node_list:
-            if node.parent:
+        for node in path:
                 path = np.array(node.path)
                 plt.plot(path[:, 0], path[:, 1], "-g")
 

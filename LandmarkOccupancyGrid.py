@@ -67,5 +67,4 @@ class LandmarkOccupancyGrid:
         if robot_radius is not None:
             circle = plt.Circle((0,0), robot_radius, color='blue', alpha=0.5, label='Robot')
             plt.gca().add_patch(circle)
-        plt.legend()
 
