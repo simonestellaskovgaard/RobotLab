@@ -28,16 +28,33 @@ class CameraUtils:
             ], dtype=np.float32)
 
     def start_camera(self):
-        """Start the PiCamera2."""
+        """Start the PiCamera2 capturing a region offset from the center."""
         self.picam2 = Picamera2()
+
+        # Full sensor size (replace with your sensor's max if needed)
+        sensor_width, sensor_height = 3280, 2464  # example for Raspberry Pi HQ
+
+        # Region of interest: shift the frame a bit above the middle
+        roi_width, roi_height = self.width, self.height  # your target width/height
+        roi_x = 0  # horizontal start
+        roi_y = (sensor_height // 2) - (roi_height // 2) - 50  # shift up by 50 pixels
+
+        # Configure camera with ROI
         config = self.picam2.create_video_configuration(
-            main={"size": (self.width, self.height), "format": "RGB888"}
+            main={
+                "size": (roi_width, roi_height),
+                "format": "RGB888",
+                "crop": (roi_x, roi_y, roi_width, roi_height)  # offset the frame
+            }
         )
-          # Apply fixed fps
-        frame_time = int(1e6 / self.fps)
-        config["controls"]["FrameDurationLimits"] = (frame_time, frame_time)
-        self.picam2.configure(config)
-        self.picam2.start()
+
+    # Fix FPS
+    frame_time = int(1e6 / self.fps)
+    config["controls"]["FrameDurationLimits"] = (frame_time, frame_time)
+
+    self.picam2.configure(config)
+    self.picam2.start()
+
 
     def get_frame(self):
         """Capture one frame as a BGR image (for OpenCV)."""
@@ -83,7 +100,7 @@ class ArucoUtils:
     def compute_rotation_to_marker(self, tvec): #mærkelig formel lol
             z_axis = np.array([0, 0, 1])
             cos_beta = np.dot(tvec, z_axis) / np.linalg.norm(tvec)
-            
+
             beta = np.arccos(cos_beta)
             return beta
         
