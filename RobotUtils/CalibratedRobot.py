@@ -81,29 +81,23 @@ class CalibratedRobot:
                 next_vec = next_p - current_p
                 next_unit = next_vec / np.linalg.norm(next_vec)
 
-                # Compute unsigned angle
                 dot = np.clip(np.dot(orientation_unit, next_unit), -1.0, 1.0)
                 angle = np.arccos(dot)
 
-                # Determine rotation direction using 2D cross product
                 cross = orientation_unit[0]*next_unit[1] - orientation_unit[1]*next_unit[0]
                 if cross < 0:
-                    angle = -angle  # clockwise rotation
+                    angle = -angle 
 
-                # Update orientation
                 orientation_unit = VectorUtils.rotate_vector(orientation_unit, angle)
                 orientation_unit /= np.linalg.norm(orientation_unit)
 
-                # Distance to next point
                 distance = np.linalg.norm(next_vec)
 
-                # Print for debug
                 print(f"angle: {math.degrees(angle):.2f} degrees")
                 print(f"distance: {distance:.2f}")
 
-                # Here you would actually turn and drive:
-                # self.turn_angle(math.degrees(angle))
-                # self.drive_distance(distance)
+                self.turn_angle(-math.degrees(angle))
+                self.drive_distance(distance)
 
 
                
