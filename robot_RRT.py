@@ -150,7 +150,7 @@ class robot_RRT:
         path.append(node.pos)
         distances.append(0.0)  # start node
         path.reverse()
-        self.distances.reverse()
+        distances.reverse()
 
         if not np.array_equal(path[-1], self.end.pos):
             path.append(self.end.pos)
