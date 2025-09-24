@@ -39,7 +39,7 @@ path =rrt.planning()
 print(f"path: {path}")
 
 
-#cal_arlo.follow_path(path)
+cal_arlo.follow_path(path)
 
 if path is None:
     print("Cannot find path")
