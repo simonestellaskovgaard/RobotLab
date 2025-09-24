@@ -36,7 +36,7 @@ rrt = robot_RRT(
 
 path =rrt.planning()
 
-smoothed_path = rrt.smooth_path()
+smoothed_path = rrt.smooth_path(path)
 
 print(f"path: {path}")
 
