@@ -2,6 +2,7 @@ import time
 import numpy as np
 import math
 import RobotUtils.Robot as robot
+from RobotUtils.vector_utils import VectorUtils
 
 class CalibratedRobot:
     def __init__(self):
@@ -65,34 +66,38 @@ class CalibratedRobot:
         if center < center_dist or left < left_dist or right < right_dist:
             self.arlo.stop()
 
-    def follow_path(self, path, start_theta=0.0):
+    def follow_path(self, path, start_orientation = np.array([0,1])):
         """
         Follow a path of points [(x0, y0), (x1, y1), ...].
         Robot turns in place towards the next point, then drives straight.
         start_theta: initial orientation of the robot in radians (0 = +x axis)
         """
-        current_theta = start_theta  # robot's current heading in radians
+        orientation_unit = start_orientation / np.linalg.norm(start_orientation)
 
         for i in range(len(path) - 1):
-            p1 = np.array(path[i])
-            p2 = np.array(path[i + 1])
-            delta = p2 - p1
+            current_p = np.array(path[i])
+            next_p= np.array(path[i + 1])
 
-            # Calculate dot product
-            dot_product = np.dot(p1, p2)
+            next_vec = next_p - current_p
 
-            # Calculate magnitudes (lengths of the vectors)
-            magnitude_A = np.linalg.norm(p1)
-            magnitude_B = np.linalg.norm(p2)
+            next_unit = next_vec /  np.linalg.norm(next_vec)
 
-            # Calculate angle in radians
-            angle_radians = np.arccos(dot_product / (magnitude_A * magnitude_B))
+            dot = np.clip(np.dot(orientation_unit, next_unit), -1.0, 1.0)
+            angle = np.arccos(dot)
+    
+            orientation_unit_hat = np.array([orientation_unit[0], -orientation_unit[1]])
+            dot_hat = np.dot(next_unit, orientation_unit_hat)
 
-            # Convert radians to degrees
-            angle_degrees = np.degrees(angle_radians)
-            distance = np.linalg.norm(delta)
+            if dot_hat < 0:
+                angle = +angle
+            else:
+                angle = -angle
 
-            print(f"desired angle (rad): {angle_degrees}")
+            orientation_unit = (VectorUtils.rotate_vector(orientation_unit, angle)) / np.linalg.norm(orientation_unit)
+
+            distance = np.linalg.norm(next_vec)
+
+            print(f"angle: {angle}")
             print(f"distance: {distance}")
 
             # Turn robot by the relative angle
