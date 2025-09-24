@@ -146,10 +146,12 @@ class robot_RRT:
         path.append(node.pos)
         path.reverse()
 
-        if path[-1] != self.end.pos:
+        # Use array_equal for comparison
+        if not np.array_equal(path[-1], self.end.pos):
             path.append(self.end.pos)
 
         return path
+
 
     def get_random_node(self):
         if np.random.randint(0, 100) > self.goal_sample_rate:
