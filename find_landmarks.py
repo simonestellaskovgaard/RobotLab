@@ -1,7 +1,6 @@
 import time
 import numpy as np
 from RobotUtils.CameraUtils import CameraUtils, ArucoUtils
-import RobotUtils.Robot as robot
 import cv2
 from RobotUtils.CalibratedRobot import CalibratedRobot
 import matplotlib.pyplot as plt
@@ -77,7 +76,7 @@ def drive_to_landmark_steps():
                 calArlo.turn_angle(angle)
         else:
             calArlo.turn_angle(15)
-            time.sleep(0.2)
+            time.sleep(0.4)
 
 try:
     drive_to_landmark_steps()
