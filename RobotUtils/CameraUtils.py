@@ -28,16 +28,40 @@ class CameraUtils:
             ], dtype=np.float32)
 
     def start_camera(self):
-        """Start the PiCamera2."""
+        """Start the PiCamera2 with the capture frame shifted down."""
         self.picam2 = Picamera2()
+
+        # Define how much to shift down (pixels)
+        shift_down = 50  # positive = move the frame down
+
+        # Calculate crop rectangle
+        # Full sensor size (adjust if different for your camera)
+        sensor_width, sensor_height = 3280, 2464  
+
+        crop_width = self.width
+        crop_height = self.height
+
+        # Top-left corner of the crop rectangle
+        crop_x = 0  # no horizontal shift
+        crop_y = (sensor_height // 2) - (crop_height // 2) + shift_down  # shifted down
+
+        # Create video config with crop
         config = self.picam2.create_video_configuration(
-            main={"size": (self.width, self.height), "format": "RGB888"}
+            main={
+                "size": (crop_width, crop_height),
+                "format": "RGB888",
+                "crop": (crop_x, crop_y, crop_width, crop_height)
+            }
         )
-          # Apply fixed fps
-        frame_time = int(1e6 / self.fps)
-        config["controls"]["FrameDurationLimits"] = (frame_time, frame_time)
-        self.picam2.configure(config)
-        self.picam2.start()
+
+    # Apply fixed FPS
+    frame_time = int(1e6 / self.fps)
+    config["controls"]["FrameDurationLimits"] = (frame_time, frame_time)
+
+    # Configure and start camera
+    self.picam2.configure(config)
+    self.picam2.start()
+
 
     def get_frame(self):
         """Capture one frame as a BGR image (for OpenCV)."""
