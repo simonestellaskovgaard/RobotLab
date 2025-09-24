@@ -44,7 +44,7 @@ class CameraUtils:
 
         # Now apply the crop / ROI shift
         sensor_width, sensor_height = 3280, 2464  # PiCamera v2.1 max resolution
-        shift_down = 50
+        shift_down = 200
 
         # Define ScalerCrop: (x, y, width, height) in sensor pixels
         x = 0
