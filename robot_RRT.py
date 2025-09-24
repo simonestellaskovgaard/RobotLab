@@ -145,16 +145,16 @@ class robot_RRT:
             path.append(node.pos)
             # distance to parent is already computed with calc_distance_to
             d = node.calc_distance_to(node.parent)
-            self.distances.append(d)
+            distances.append(d)
             node = node.parent
         path.append(node.pos)
-        self.distances.append(0.0)  # start node
+        distances.append(0.0)  # start node
         path.reverse()
         self.distances.reverse()
 
         if not np.array_equal(path[-1], self.end.pos):
             path.append(self.end.pos)
-            self.distances_list.append(0.0)
+            distances.append(0.0)
 
         return path, distances
 
