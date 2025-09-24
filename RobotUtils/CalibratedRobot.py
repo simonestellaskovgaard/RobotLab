@@ -86,7 +86,7 @@ class CalibratedRobot:
             angle = np.arccos(dot)
     
             orientation_unit_hat = np.array([orientation_unit[0], -orientation_unit[1]])
-            dot_hat = np.dot(next_unit, orientation_unit_hat)
+            dot_hat = np.dot(next_unit, orientation_unit_hat)   
 
             if dot_hat < 0:
                 angle = +angle
@@ -97,7 +97,7 @@ class CalibratedRobot:
 
             distance = np.linalg.norm(next_vec)
 
-            print(f"angle: {angle}")
+            print(f"angle: {math.degrees(angle)}")
             print(f"distance: {distance}")
 
             # Turn robot by the relative angle
