@@ -28,33 +28,16 @@ class CameraUtils:
             ], dtype=np.float32)
 
     def start_camera(self):
-        """Start PiCamera2 with shifted capture window."""
+        """Start the PiCamera2."""
         self.picam2 = Picamera2()
-
-        # Create standard video configuration
         config = self.picam2.create_video_configuration(
             main={"size": (self.width, self.height), "format": "RGB888"}
         )
-
-        # Apply fixed FPS
+          # Apply fixed fps
         frame_time = int(1e6 / self.fps)
         config["controls"]["FrameDurationLimits"] = (frame_time, frame_time)
-
         self.picam2.configure(config)
-
-        # Now apply the crop / ROI shift
-        sensor_width, sensor_height = 3280, 2464  # PiCamera v2.1 max resolution
-        shift_down = 200
-
-        # Define ScalerCrop: (x, y, width, height) in sensor pixels
-        x = 0
-        y = (sensor_height // 2) - (self.height // 2) + shift_down
-        w = self.width
-        h = self.height
-        self.picam2.set_controls({"ScalerCrop": (x, y, w, h)})
-
         self.picam2.start()
-
 
     def get_frame(self):
         """Capture one frame as a BGR image (for OpenCV)."""

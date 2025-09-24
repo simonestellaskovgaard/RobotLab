@@ -64,7 +64,6 @@ def drive_to_landmark_steps():
                 calArlo.drive_distance(drive_step)
                 time.sleep(0.05)
 
-                # Recheck the marker position
                 frame = cam.get_frame()
                 cv2.imwrite("frame.png", cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
                 plt.imsave("frame.png", frame)

@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 from RobotUtils.CameraUtils import CameraUtils, ArucoUtils
 from RobotUtils.LandmarkUtils import LandmarkUtils
 from LandmarkOccupancyGrid import LandmarkOccupancyGrid
+from robot_model import RobotModel
+from robot_RRT import robot_RRT
 
 cam = CameraUtils()
 cam.start_camera()
@@ -17,10 +19,24 @@ landmarks_for_grid = [(pos[0], pos[1], landmark_radius) for _, pos in landmarks]
                       
 grid_map.add_landmarks(landmarks_for_grid)
 
-robot_pos = (0.0, 0.0)
-robot_radius = 0.25
+
 
 plt.figure(figsize=(5,5))
-grid_map.draw_map( robot_radius=robot_radius)
+grid_map.draw_map()
 plt.savefig("occupancy_grid.png", bbox_inches='tight')
 plt.close()  
+
+robot = RobotModel()
+
+path_res = 0.05
+
+rrt = robot_RRT(
+    start=[0, 0],
+    goal=[0, 1.9],
+    robot_model=robot,
+    map=grid_map,
+    expand_dis=0.2,
+    path_resolution=path_res,
+    )
+
+map.add_landma
