@@ -1,7 +1,7 @@
 import time
 import numpy as np
 from RobotUtils.CameraUtils import CameraUtils, ArucoUtils
-import RobotUtils.robot as robot
+import RobotUtils.Robot as robot
 import cv2
 from RobotUtils.CalibratedRobot import CalibratedRobot
 import matplotlib.pyplot as plt
