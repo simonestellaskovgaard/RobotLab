@@ -132,7 +132,7 @@ class robot_RRT:
         self.map.draw_map()
 
         for node in path:
-                path = np.array(node.path)
+                path = np.array(path)
                 plt.plot(path[:, 0], path[:, 1], "-g")
 
         plt.plot(self.start.pos[0], self.start.pos[1], "xr")
