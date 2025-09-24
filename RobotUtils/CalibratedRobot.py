@@ -78,17 +78,21 @@ class CalibratedRobot:
             p2 = np.array(path[i + 1])
             delta = p2 - p1
 
-            # Desired global heading to next waypoint (in radians)
-            desired_angle = math.atan2(delta[1], delta[0])
+            # Calculate dot product
+            dot_product = np.dot(p1, p2)
 
-            # Compute relative turn needed, normalized to [-pi, pi]
-            angle_to_turn = (desired_angle - current_theta + math.pi) % (2 * math.pi) - math.pi
+            # Calculate magnitudes (lengths of the vectors)
+            magnitude_A = np.linalg.norm(p1)
+            magnitude_B = np.linalg.norm(p2)
 
-            # Distance to the next point
+            # Calculate angle in radians
+            angle_radians = np.arccos(dot_product / (magnitude_A * magnitude_B))
+
+            # Convert radians to degrees
+            angle_degrees = np.degrees(angle_radians)
             distance = np.linalg.norm(delta)
 
-            print(f"desired angle (rad): {math.degrees(desired_angle)}")
-            print(f"relative turn (deg): {math.degrees(angle_to_turn)}")
+            print(f"desired angle (rad): {angle_degrees}")
             print(f"distance: {distance}")
 
             # Turn robot by the relative angle
