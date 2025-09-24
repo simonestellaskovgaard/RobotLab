@@ -115,6 +115,7 @@ class robot_RRT:
             path.append(node.pos)
             node = node.parent
         path.append(node.pos)
+        path.reverse()
 
         return path
 
