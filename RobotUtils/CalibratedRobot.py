@@ -71,25 +71,33 @@ class CalibratedRobot:
         Robot turns in place towards the next point, then drives straight.
         start_theta: initial orientation of the robot in radians (0 = +x axis)
         """
-        current_theta = start_theta  # keep track of robot heading
+        current_theta = start_theta  # robot's current heading in radians
 
         for i in range(len(path) - 1):
             p1 = np.array(path[i])
             p2 = np.array(path[i + 1])
             delta = p2 - p1
 
+            # Desired global heading to next waypoint (in radians)
             desired_angle = math.atan2(delta[1], delta[0])
 
-            # compute the distance to the next point
-            distance = np.linalg.norm(delta)
-            print(f"angle: {math.degrees(desired_angle)}")
-            print(f"distance: {distance}")
-            # turn and drive
-            self.turn_angle(-math.degrees(desired_angle))
-            self.drive_distance(distance)
+            # Compute relative turn needed, normalized to [-pi, pi]
+            angle_to_turn = (desired_angle - current_theta + math.pi) % (2 * math.pi) - math.pi
 
-            # update current heading
-            current_theta += desired_angle
+            # Distance to the next point
+            distance = np.linalg.norm(delta)
+
+            print(f"desired angle (rad): {desired_angle}")
+            print(f"relative turn (deg): {math.degrees(angle_to_turn)}")
+            print(f"distance: {distance}")
+
+            # Turn robot by the relative angle
+            #self.turn_angle(math.degrees(angle_to_turn))  # convert to degrees if needed
+            # Drive forward
+            #self.drive_distance(distance)
+
+            # Update current heading
+            current_theta += angle_to_turn
 
                
     def stop(self):

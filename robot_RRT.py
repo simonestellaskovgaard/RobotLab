@@ -138,13 +138,16 @@ class robot_RRT:
 
 
     def generate_final_course(self, goal_ind):
-        path = [self.end.pos]
+        path = []
         node = self.node_list[goal_ind]
         while node.parent is not None:
             path.append(node.pos)
             node = node.parent
         path.append(node.pos)
         path.reverse()
+
+        if path[-1] != self.end.pos:
+            path.append(self.end.pos)
 
         return path
 
