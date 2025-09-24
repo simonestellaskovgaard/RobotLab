@@ -10,7 +10,7 @@ cam = CameraUtils()
 cam.start_camera()
 aruco = ArucoUtils()
 landmark_utils = LandmarkUtils(cam, aruco, cube_side=0.05, robot_radius=0.1)
-grid_map = LandmarkOccupancyGrid(low=(-1,-1), high=(2.5, 2.5), res=0.05)
+grid_map = LandmarkOccupancyGrid(low=(-2.5,-1), high=(2.5, 2.5), res=0.05)
 cal_arlo = CalibratedRobot()
 
 landmarks = landmark_utils.map_landmarks()
