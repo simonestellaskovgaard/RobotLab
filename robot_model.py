@@ -1,4 +1,4 @@
-from numpy import np
+import numpy as np
 
 class RobotModel:
     def __init__(self, robot_radius = 0.25):
