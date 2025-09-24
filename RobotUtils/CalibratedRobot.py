@@ -78,7 +78,6 @@ class CalibratedRobot:
             p2 = np.array(path[i + 1])
             delta = p2 - p1
 
-            # compute the angle to next point
             desired_angle = math.atan2(delta[1], delta[0])
             # compute the relative turn needed, normalized to [-pi, pi]
             angle_to_turn = (desired_angle - current_theta + math.pi) % (2 * math.pi) - math.pi
@@ -87,7 +86,7 @@ class CalibratedRobot:
             distance = np.linalg.norm(delta)
 
             # turn and drive
-            self.turn_angle(math.degrees(angle_to_turn))
+            self.turn_angle(-math.degrees(angle_to_turn))
             self.drive_distance(distance)
 
             # update current heading

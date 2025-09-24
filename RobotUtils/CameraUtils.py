@@ -80,7 +80,7 @@ class ArucoUtils:
         return dist
         
     
-    def compute_rotation_to_marker(self, tvec): #mærkelig formel lol
+    def compute_rotation_to_marker(self, tvec):
             z_axis = np.array([0, 0, 1])
             cos_beta = np.dot(tvec, z_axis) / np.linalg.norm(tvec)
             
