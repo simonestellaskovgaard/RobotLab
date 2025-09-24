@@ -40,7 +40,7 @@ class CameraUtils:
         roi_y = (sensor_height // 2) - (roi_height // 2) - 50  # shift up by 50 pixels
 
         # Configure camera with ROI
-        config = self.picam2.create_video_configuration(
+        config = Picamera2.create_video_configuration(
             main={
                 "size": (roi_width, roi_height),
                 "format": "RGB888",
