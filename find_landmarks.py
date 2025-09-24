@@ -1,9 +1,10 @@
 import time
 import numpy as np
-from Robotutils.CameraDetection_util import CameraUtils, ArucoUtils
-import Robotutils.robot as robot
+from RobotUtils.CameraUtils import CameraUtils, ArucoUtils
+import RobotUtils.robot as robot
 import cv2
-from Robotutils.CalibratedRobot import CalibratedRobot
+from RobotUtils.CalibratedRobot import CalibratedRobot
+import matplotlib.pyplot as plt
 
 calArlo = CalibratedRobot()
 cam = CameraUtils()
@@ -39,10 +40,10 @@ def drive_to_landmark():
                 isDriving = False
         else:
             calArlo.turn_angle(15)
-            time.sleep()
+            time.sleep(0.2)
 
 def drive_to_landmark_steps():
-    step_distance = 0.3
+    step_distance = 0.2
     while True:
         frame = cam.get_frame()
         corners, ids = aruco.detect_markers(frame)
@@ -58,10 +59,11 @@ def drive_to_landmark_steps():
 
             calArlo.turn_angle(angle)
 
-            while dist > 0.1:  # stop when very close
+            while dist > 0.1:  
                 drive_step = min(step_distance, dist)
+                print(f"Drove distance: {drive_step}")
                 calArlo.drive_distance(drive_step)
-                time.sleep(0.1)  # short pause
+                time.sleep(0.1)
 
                 # Recheck the marker position
                 frame = cam.get_frame()
@@ -75,11 +77,10 @@ def drive_to_landmark_steps():
                 calArlo.turn_angle(angle)
         else:
             calArlo.turn_angle(15)
-            time.sleep(0.1)
-
+            time.sleep(0.2)
 
 try:
-    drive_to_landmark()
+    drive_to_landmark_steps()
 finally:
     calArlo.stop()
     cam.stop_camera()
