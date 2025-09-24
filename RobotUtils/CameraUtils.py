@@ -81,7 +81,9 @@ class ArucoUtils:
         
     
     def compute_rotation_to_marker(self, tvec): #mærkelig formel lol
-            # Compute angle
-            angle = -np.degrees(np.arctan2(tvec[0], tvec[2]))
-            return angle
+            z_axis = np.array([0, 0, 1])
+            cos_beta = np.dot(tvec, z_axis) / np.linalg.norm(tvec)
+            
+            beta = np.arccos(cos_beta)
+            return beta
         
