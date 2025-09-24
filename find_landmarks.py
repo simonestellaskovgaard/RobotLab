@@ -62,7 +62,7 @@ def drive_to_landmark_steps():
                 drive_step = min(step_distance, dist)
                 print(f"Drove distance: {drive_step}")
                 calArlo.drive_distance(drive_step)
-                time.sleep(0.1)
+                time.sleep(0.05)
 
                 # Recheck the marker position
                 frame = cam.get_frame()
