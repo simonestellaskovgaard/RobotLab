@@ -30,7 +30,7 @@ class robot_RRT:
                  map,           #map should allow the algorithm to query if the path in a node is in collision. note this will ignore the robot geom
                  expand_dis=0.2,
                  path_resolution=0.05,
-                 goal_sample_rate=10,
+                 goal_sample_rate=25,
                  max_iter=500,
                  ):
 
