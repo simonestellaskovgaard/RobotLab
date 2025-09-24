@@ -92,12 +92,9 @@ class CalibratedRobot:
             print(f"distance: {distance}")
 
             # Turn robot by the relative angle
-            self.turn_angle(math.degrees(angle_to_turn))  # convert to degrees if needed
+            #self.turn_angle(-math.degrees(angle_to_turn))  # convert to degrees if needed
             # Drive forward
-            self.drive_distance(distance)
-
-            # Update current heading
-            current_theta += angle_to_turn
+            #self.drive_distance(distance)
 
                
     def stop(self):
