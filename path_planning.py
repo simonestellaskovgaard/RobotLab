@@ -43,7 +43,7 @@ print(f"path: {path}")
 print(f"Smoothedpath: {smoothed_path}")
 
 
-#cal_arlo.follow_path(path)
+cal_arlo.follow_path(path)
 
 if path is None:
     print("Cannot find path")
