@@ -66,6 +66,8 @@ def drive_to_landmark_steps():
 
                 # Recheck the marker position
                 frame = cam.get_frame()
+                cv2.imwrite("frame.png", cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
+                plt.imsave("frame.png", frame)
                 corners, ids = aruco.detect_markers(frame)
                 if ids is None:
                     print("Lost marker")
