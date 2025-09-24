@@ -1,7 +1,7 @@
 import numpy as np
 
 class RobotModel:
-    def __init__(self, robot_radius = 0.25):
+    def __init__(self, robot_radius = 0.225):
         self.robot_radius = robot_radius
         
     def dyn(self, from_pos, to_pos, n_steps):
