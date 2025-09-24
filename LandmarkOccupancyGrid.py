@@ -62,25 +62,10 @@ class LandmarkOccupancyGrid:
 
 
     
-    def draw_map(self, robot_radius=0.25):
+    def draw_map(self, robot_radius=None):
         plt.imshow(self.grid.T, cmap="Greys", origin='lower', vmin=0, vmax=1, extent=self.extent, interpolation='none')
         if robot_radius is not None:
             circle = plt.Circle((0,0), robot_radius, color='blue', alpha=0.5, label='Robot')
             plt.gca().add_patch(circle)
         plt.legend()
-
-if __name__ == '__main__':
-    grid_map = LandmarkOccupancyGrid(low=(-2,-2), high=(2,2), res=0.05)
-    landmarks = [
-        (0.5, 0.5, 0.2),
-        (1.2, 1.0, 0.15),
-        (1.8, 1.5, 0.25)
-    ]
-    grid_map.add_landmarks(landmarks)
-
-    robot_radius = 0.1
-
-    plt.figure(figsize=(5,5))
-    grid_map.draw_map( robot_radius=robot_radius)
-    plt.show()
 
