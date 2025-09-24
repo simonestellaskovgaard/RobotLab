@@ -19,13 +19,6 @@ landmarks_for_grid = [(pos[0], pos[1], landmark_radius) for _, pos in landmarks]
                       
 grid_map.add_landmarks(landmarks_for_grid)
 
-
-
-plt.figure(figsize=(5,5))
-grid_map.draw_map()
-plt.savefig("occupancy_grid.png", bbox_inches='tight')
-plt.close()  
-
 robot = RobotModel()
 
 path_res = 0.05
@@ -39,4 +32,9 @@ rrt = robot_RRT(
     path_resolution=path_res,
     )
 
-map.add_landma
+path =rrt.planning()
+
+if path is None:
+    print("Cannot find path")
+else:
+    print("found path")
