@@ -87,7 +87,7 @@ class CalibratedRobot:
             # Distance to the next point
             distance = np.linalg.norm(delta)
 
-            print(f"desired angle (rad): {desired_angle}")
+            print(f"desired angle (rad): {math.degrees(desired_angle)}")
             print(f"relative turn (deg): {math.degrees(angle_to_turn)}")
             print(f"distance: {distance}")
 
