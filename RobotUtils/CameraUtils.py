@@ -54,13 +54,13 @@ class CameraUtils:
             }
         )
 
-    # Apply fixed FPS
-    frame_time = int(1e6 / self.fps)
-    config["controls"]["FrameDurationLimits"] = (frame_time, frame_time)
+        # Apply fixed FPS
+        frame_time = int(1e6 / self.fps)
+        config["controls"]["FrameDurationLimits"] = (frame_time, frame_time)
 
-    # Configure and start camera
-    self.picam2.configure(config)
-    self.picam2.start()
+    #    Configure and start camera
+        self.picam2.configure(config)
+        self.picam2.start()
 
 
     def get_frame(self):
