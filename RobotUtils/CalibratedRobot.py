@@ -66,7 +66,7 @@ class CalibratedRobot:
         if center < center_dist or left < left_dist or right < right_dist:
             self.arlo.stop()
 
-    def follow_path(self, path, start_orientation=np.array([0, 1])):
+    def follow_path(self, path, distances, start_orientation=np.array([0, 1])):
             """
             Follow a path of points [(x0, y0), (x1, y1), ...].
             Robot turns in place towards the next point, then drives straight.
@@ -91,13 +91,11 @@ class CalibratedRobot:
                 orientation_unit = VectorUtils.rotate_vector(orientation_unit, angle)
                 orientation_unit /= np.linalg.norm(orientation_unit)
 
-                distance = np.linalg.norm(next_vec)
-
                 print(f"angle: {math.degrees(angle):.2f} degrees")
-                print(f"distance: {distance:.2f}")
+                print(f"distance: {distances[i]:.2f}")
 
                 self.turn_angle(-math.degrees(angle))
-                self.drive_distance(distance)
+                self.drive_distance(distances[i])
 
 
                
