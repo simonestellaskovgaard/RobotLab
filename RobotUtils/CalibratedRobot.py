@@ -1,4 +1,6 @@
 import time
+import numpy as np
+import math
 import RobotUtils.Robot as robot
 
 class CalibratedRobot:
@@ -62,6 +64,35 @@ class CalibratedRobot:
         right = self.arlo.read_right_ping_sensor()
         if center < center_dist or left < left_dist or right < right_dist:
             self.arlo.stop()
+
+    def follow_path(self, path, start_theta=0.0):
+        """
+        Follow a path of points [(x0, y0), (x1, y1), ...].
+        Robot turns in place towards the next point, then drives straight.
+        start_theta: initial orientation of the robot in radians (0 = +x axis)
+        """
+        current_theta = start_theta  # keep track of robot heading
+
+        for i in range(len(path) - 1):
+            p1 = np.array(path[i])
+            p2 = np.array(path[i + 1])
+            delta = p2 - p1
+
+            # compute the angle to next point
+            desired_angle = math.atan2(delta[1], delta[0])
+            # compute the relative turn needed, normalized to [-pi, pi]
+            angle_to_turn = (desired_angle - current_theta + math.pi) % (2 * math.pi) - math.pi
+
+            # compute the distance to the next point
+            distance = np.linalg.norm(delta)
+
+            # turn and drive
+            self.turn_angle(math.degrees(angle_to_turn))
+            self.drive_distance(distance)
+
+            # update current heading
+            current_theta += angle_to_turn
+
                
     def stop(self):
         self.arlo.stop()

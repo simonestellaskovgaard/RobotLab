@@ -4,12 +4,14 @@ from RobotUtils.LandmarkUtils import LandmarkUtils
 from LandmarkOccupancyGrid import LandmarkOccupancyGrid
 from robot_model import RobotModel
 from robot_RRT import robot_RRT
+from RobotUtils.CalibratedRobot import CalibratedRobot
 
 cam = CameraUtils()
 cam.start_camera()
 aruco = ArucoUtils()
 landmark_utils = LandmarkUtils(cam, aruco, cube_side=0.05, robot_radius=0.1)
 grid_map = LandmarkOccupancyGrid(low=(-3,-3), high=(3, 3), res=0.05)
+cal_arlo = CalibratedRobot()
 
 landmarks = landmark_utils.map_landmarks()
 print(f"landmarks detected: {landmarks}")
@@ -37,6 +39,8 @@ path =rrt.planning()
 print(f"path: {path}")
 
 rrt.draw_graph(path)
+
+#cal_arlo.follow_path(path)
 
 if path is None:
     print("Cannot find path")
