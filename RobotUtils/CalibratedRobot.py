@@ -79,18 +79,17 @@ class CalibratedRobot:
             delta = p2 - p1
 
             desired_angle = math.atan2(delta[1], delta[0])
-            # compute the relative turn needed, normalized to [-pi, pi]
-            angle_to_turn = (desired_angle - current_theta + math.pi) % (2 * math.pi) - math.pi
 
             # compute the distance to the next point
             distance = np.linalg.norm(delta)
-
+            print(f"angle: {desired_angle}")
+            print(f"distance: {distance}")
             # turn and drive
-            self.turn_angle(-math.degrees(angle_to_turn))
+            self.turn_angle(-math.degrees(desired_angle))
             self.drive_distance(distance)
 
             # update current heading
-            current_theta += angle_to_turn
+            current_theta += desired_angle
 
                
     def stop(self):

@@ -107,6 +107,35 @@ class robot_RRT:
         new_node.parent = from_node
 
         return new_node
+    
+    def smooth_path(self, path, iterations=100):
+        if path is None or len(path) < 3:
+            return path  # nothing to smooth
+
+        path = path.copy()
+        for _ in range(iterations):
+            i = np.random.randint(0, len(path) - 2)
+            j = np.random.randint(i + 1, len(path) - 1)
+            p1, p2 = path[i], path[j]
+
+            # check if straight line between p1 and p2 is collision free
+            if self.is_collision_free_line(p1, p2):
+                # replace intermediate nodes
+                path = path[:i+1] + [p2] + path[j+1:]
+
+        return path
+
+    def is_collision_free_line(self, p1, p2, step_size=0.05):
+        p1 = np.array(p1)
+        p2 = np.array(p2)
+        dist = np.linalg.norm(p2 - p1)
+        n_steps = int(dist / step_size)
+        for i in range(n_steps + 1):
+            interp = p1 + (p2 - p1) * (i / n_steps)
+            if self.map.robot_collision(interp, self.robot.robot_radius):
+                return False
+        return True
+
 
     def generate_final_course(self, goal_ind):
         path = [self.end.pos]
@@ -128,7 +157,7 @@ class robot_RRT:
             rnd = self.Node(self.end.pos)
         return rnd
 
-    def draw_graph(self, path):
+    def draw_graph(self, path, name = None):
         # draw the map
         self.map.draw_map()
 
@@ -140,7 +169,7 @@ class robot_RRT:
         plt.plot(self.end.pos[0], self.end.pos[1], "xr")
         plt.axis(self.map.extent)
         plt.grid(True)
-        plt.savefig("rrt_map.png")
+        plt.savefig(f"rrt_map_{name}.png")
 
 
     @staticmethod
