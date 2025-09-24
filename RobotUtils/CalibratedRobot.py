@@ -1,5 +1,5 @@
 import time
-import Robotutils.robot as robot
+import RobotUtils.Robot as robot
 
 class CalibratedRobot:
     def __init__(self):
