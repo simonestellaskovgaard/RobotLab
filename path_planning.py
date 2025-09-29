@@ -22,7 +22,7 @@ landmarks_for_grid = [(pos[0], pos[1], landmark_radius) for _, pos in landmarks]
                       
 grid_map.add_landmarks(landmarks_for_grid)
 
-robot = RobotModel()
+""" robot = RobotModel()
 
 path_res = 0.05
 
@@ -48,4 +48,4 @@ else:
     print(f"Smoothedpath: {smoothed_path}")
     #cal_arlo.follow_path(smoothed_path)
     rrt.draw_graph(smoothed_path, name = "1")
-    print("found path")
+    print("found path") """
