@@ -67,39 +67,32 @@ class CalibratedRobot:
             self.arlo.stop()
 
     def follow_path(self, path, start_orientation=np.array([0, 1])):
-            """
-            Follow a path of points [(x0, y0), (x1, y1), ...].
-            Robot turns in place towards the next point, then drives straight.
-            start_orientation: initial orientation of the robot (unit vector)
-            """
-            orientation_unit = start_orientation / np.linalg.norm(start_orientation)
+        orientation_unit = start_orientation / np.linalg.norm(start_orientation)
 
-            for i in range(len(path) - 1):
-                current_p = np.array(path[i])
-                next_p = np.array(path[i + 1])
+        for i in range(len(path) - 1):
+            current_p = np.array(path[i])
+            next_p = np.array(path[i + 1])
 
-                next_vec = next_p - current_p
-                next_unit = next_vec / np.linalg.norm(next_vec)
+            next_vec = next_p - current_p
+            next_unit = next_vec / np.linalg.norm(next_vec)
 
-                dot = np.clip(np.dot(orientation_unit, next_unit), -1.0, 1.0)
-                angle = np.arccos(dot)
+            dot = np.clip(np.dot(orientation_unit, next_unit), -1.0, 1.0)
+            angle = np.arccos(dot)
 
-                cross = orientation_unit[0]*next_unit[1] - orientation_unit[1]*next_unit[0]
-                if cross < 0:
-                    angle = -angle 
+            cross = orientation_unit[0]*next_unit[1] - orientation_unit[1]*next_unit[0]
+            if cross < 0:
+                angle = -angle 
 
-                orientation_unit = VectorUtils.rotate_vector(orientation_unit, angle)
-                orientation_unit /= np.linalg.norm(orientation_unit)
+            orientation_unit = VectorUtils.rotate_vector(orientation_unit, angle)
+            orientation_unit /= np.linalg.norm(orientation_unit)
 
-                distance = np.linalg.norm(next_vec)
+            distance = np.linalg.norm(next_vec)
 
-                print(f"angle: {math.degrees(angle):.2f} degrees")
-                print(f"distance: {distance:.2f}")
+            print(f"angle: {math.degrees(angle):.2f} degrees")
+            print(f"distance: {distance:.2f}")
 
-                self.turn_angle(-math.degrees(angle))
-                self.drive_distance(distance)
-
-
-               
+            self.turn_angle(-math.degrees(angle))
+            self.drive_distance(distance)
+            
     def stop(self):
         self.arlo.stop()

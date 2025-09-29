@@ -28,8 +28,8 @@ class robot_RRT:
                  goal,
                  robot_model,   #model of the robot
                  map,           #map should allow the algorithm to query if the path in a node is in collision. note this will ignore the robot geom
-                 expand_dis=0.2,
-                 path_resolution=0.05,
+                 expand_dis=0.2, # maximum step size that the tree expands when a new node is added
+                 path_resolution=0.05, #granularity of checking path for collinsions
                  goal_sample_rate=25,
                  max_iter=500,
                  ):
@@ -52,8 +52,6 @@ class robot_RRT:
     def planning(self):
         """
         rrt path planning
-
-        animation: flag for animation on or off
         """
 
         self.node_list = [self.start]
@@ -92,7 +90,7 @@ class robot_RRT:
         n_expand = int(extend_length // self.path_resolution)
 
         if n_expand > 0:
-            steer_path = self.robot.dyn(new_node.pos, to_node.pos, n_expand)
+            steer_path = self.robot.forward(new_node.pos, to_node.pos, n_expand)
             #use the end position to represent the current node and update the path
             new_node.pos = steer_path[-1]
             new_node.path += steer_path
@@ -107,39 +105,9 @@ class robot_RRT:
         new_node.parent = from_node
 
         return new_node
-    
-    def smooth_path(self, path, iterations=100):
-        if path is None or len(path) < 3:
-            return path  # nothing to smooth
-
-        path = path.copy()
-        for _ in range(iterations):
-            i = np.random.randint(0, len(path) - 2)
-            j = np.random.randint(i + 1, len(path) - 1)
-            p1, p2 = path[i], path[j]
-
-            # check if straight line between p1 and p2 is collision free
-            if self.is_collision_free_line(p1, p2):
-                # replace intermediate nodes
-                path = path[:i+1] + [p2] + path[j+1:]
-
-        return path
-
-    def is_collision_free_line(self, p1, p2, step_size=0.05):
-        p1 = np.array(p1)
-        p2 = np.array(p2)
-        dist = np.linalg.norm(p2 - p1)
-        n_steps = int(dist / step_size)
-        for i in range(n_steps + 1):
-            interp = p1 + (p2 - p1) * (i / n_steps)
-            if self.map.robot_collision(interp, self.robot.robot_radius):
-                return False
-        return True
-
 
     def generate_final_course(self, goal_ind):
         path = []
-        distances = []
         node = self.node_list[goal_ind]
         while node.parent is not None:
             path.append(node.pos)
@@ -191,6 +159,32 @@ class robot_RRT:
             return False
         for p in node.path:
             if self.map.robot_collision(np.array(p), self.robot.robot_radius):
+                return False
+        return True
+    
+    def smooth_path(self, path, iterations=100):
+        if path is None or len(path) < 3:
+            return path  # nothing to smooth
+
+        path = path.copy()
+        for _ in range(iterations):
+            i = np.random.randint(0, len(path) - 2)
+            j = np.random.randint(i + 1, len(path) - 1)
+            p1, p2 = path[i], path[j]
+
+            if self.is_collision_free_line(p1, p2):
+                path = path[:i+1] + [p2] + path[j+1:]
+
+        return path
+
+    def is_collision_free_line(self, p1, p2, path_resolution=0.05):
+        p1 = np.array(p1)
+        p2 = np.array(p2)
+        dist = np.linalg.norm(p2 - p1)
+        n_steps = int(dist / path_resolution)
+        for i in range(n_steps + 1):
+            interp = p1 + (p2 - p1) * (i / n_steps)
+            if self.map.robot_collision(interp, self.robot.robot_radius):
                 return False
         return True
     
