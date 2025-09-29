@@ -9,7 +9,7 @@ from RobotUtils.CalibratedRobot import CalibratedRobot
 cam = CameraUtils()
 cam.start_camera()
 aruco = ArucoUtils()
-landmark_utils = LandmarkUtils(cam, aruco, cube_side=0.05, robot_radius=0.1)
+landmark_utils = LandmarkUtils(cam, aruco)
 grid_map = LandmarkOccupancyGrid(low=(-2,-1), high=(1.5, 5), res=0.05)
 cal_arlo = CalibratedRobot()
 
