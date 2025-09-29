@@ -31,7 +31,8 @@ class CameraUtils:
         """Start the PiCamera2."""
         self.picam2 = Picamera2()
         config = self.picam2.create_video_configuration(
-            main={"size": (self.width, self.height), "format": "RGB888"}
+            main={"size": (self.width, self.height), "format": "RGB888"},
+            controls = { "ScalarCrop": (0,0,3280,2464)}
         )
           # Apply fixed fps
         frame_time = int(1e6 / self.fps)
