@@ -91,7 +91,7 @@ class CalibratedRobot:
             print(f"angle: {math.degrees(angle):.2f} degrees")
             print(f"distance: {distance:.2f}")
 
-            self.turn_angle(-math.degrees(angle))
+            self.turn_angle(math.degrees(angle))
             self.drive_distance(distance)
             
     def stop(self):
