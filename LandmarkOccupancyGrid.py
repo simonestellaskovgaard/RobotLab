@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import cv2
 
 class LandmarkOccupancyGrid:
     def __init__(self, low=(0, 0), high=(2, 2), res=0.05) -> None:
@@ -28,7 +27,11 @@ class LandmarkOccupancyGrid:
         """
         Checks if a robot with radius r_robot at position (x, y) collides with an obstacle
         """
-        indices = [int((pos[i] - self.map_area[0][i]) // self.resolution) for i in range(2)]
+        indices = [
+        int((pos[0] - self.map_area[0][0]) // self.resolution),
+        int(((pos[1] -r_robot) - self.map_area[0][1]) // self.resolution)
+    ]
+
 
         cell_radius = int(np.ceil(r_robot / self.resolution))
 
