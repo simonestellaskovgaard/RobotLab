@@ -30,7 +30,7 @@ class LandmarkOccupancyGrid:
         indices = [
         int((pos[0] - self.map_area[0][0]) // self.resolution),
         int(((pos[1] -r_robot) - self.map_area[0][1]) // self.resolution)
-    ]
+        ]
 
 
         cell_radius = int(np.ceil(r_robot / self.resolution))
