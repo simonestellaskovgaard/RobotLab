@@ -33,8 +33,8 @@ class CameraUtils:
         self.picam2 = Picamera2()
         pprint.pprint(self.picam2.camera_controls)
         config = self.picam2.create_video_configuration(
-            main={"size": (self.width, self.height), "format": "RGB888"}
-            #controls = { "ScalerCrop": (0,0,3280,2464)}
+            main={"size": (self.width, self.height), "format": "RGB888"},
+            controls = { "ScalerCrop": (0,0,1920,1080)}
         )
           # Apply fixed fps
         frame_time = int(1e6 / self.fps)
