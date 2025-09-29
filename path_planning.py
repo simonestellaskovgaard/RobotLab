@@ -28,7 +28,7 @@ path_res = 0.05
 
 rrt = robot_RRT(
     start=[0, 0],
-    goal=[0, 2.5],
+    goal=[0, 2],
     robot_model=robot,
     map=grid_map,
     expand_dis=0.2,
