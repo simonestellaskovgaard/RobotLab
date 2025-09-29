@@ -16,6 +16,7 @@ cal_arlo = CalibratedRobot()
 landmarks = landmark_utils.map_landmarks()
 print(f"landmarks detected: {landmarks}")
 
+
 landmark_radius = 0.165
 landmarks_for_grid = [(pos[0], pos[1], landmark_radius) for _, pos in landmarks]
                       
@@ -45,6 +46,6 @@ else:
     print(f"path: {path}")
 
     print(f"Smoothedpath: {smoothed_path}")
-    cal_arlo.follow_path(smoothed_path)
+    #cal_arlo.follow_path(smoothed_path)
     rrt.draw_graph(smoothed_path, name = "1")
     print("found path")
