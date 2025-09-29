@@ -46,6 +46,6 @@ else:
     print(f"path: {path}")
 
     print(f"Smoothedpath: {smoothed_path}")
-    #cal_arlo.follow_path(smoothed_path)
+    cal_arlo.follow_path(smoothed_path)
     rrt.draw_graph(smoothed_path, name = "1")
     print("found path")
