@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2
 
 class LandmarkUtils:
     def __init__(self, cam, aruco, cube_side=0.05, robot_radius=0.1):
