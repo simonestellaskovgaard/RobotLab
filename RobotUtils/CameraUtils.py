@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from picamera2 import Picamera2 ## should only be downloaded onto the raspberry pi, will not run on your own pc
+import pprint
 
 
 
@@ -30,7 +31,7 @@ class CameraUtils:
     def start_camera(self):
         """Start the PiCamera2."""
         self.picam2 = Picamera2()
-        print(self.picam2.camera_controls)
+        pprint.pprint(self.picam2.camera_controls)
         config = self.picam2.create_video_configuration(
             main={"size": (self.width, self.height), "format": "RGB888"}
             #controls = { "ScalerCrop": (0,0,3280,2464)}
