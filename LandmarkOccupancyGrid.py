@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2
 
 class LandmarkOccupancyGrid:
     def __init__(self, low=(0, 0), high=(2, 2), res=0.05) -> None:
@@ -59,8 +60,6 @@ class LandmarkOccupancyGrid:
                     if np.linalg.norm(centroid - np.array([x, y])) <= r:
                         self.grid[i, j] = 1
                         break  
-
-
     
     def draw_map(self, robot_radius=None):
         plt.imshow(self.grid.T, cmap="Greys", origin='lower', vmin=0, vmax=1, extent=self.extent, interpolation='none')
