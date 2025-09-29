@@ -12,7 +12,7 @@ class CameraUtils:
     OpenCV.
     """
     ## Camera calibration
-    def __init__(self, width=1920, height=1080, fx=2569, fy=2569, cx=None, cy=None, fps = 30):
+    def __init__(self, width=3280, height=2464, fx=2569, fy=2569, cx=None, cy=None, fps = 30):
         self.picam2 = None
         self.width = width #resultion
         self.height = height #resulution
@@ -34,7 +34,7 @@ class CameraUtils:
         pprint.pprint(self.picam2.camera_controls)
         config = self.picam2.create_video_configuration(
             main={"size": (self.width, self.height), "format": "RGB888"},
-            controls = { "ScalerCrop": (0,0,1920,1080)}
+            controls = { "ScalerCrop": (0,0,3280,2464)}
         )
           # Apply fixed fps
         frame_time = int(1e6 / self.fps)
