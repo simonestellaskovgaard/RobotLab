@@ -11,7 +11,7 @@ class CameraUtils:
     OpenCV.
     """
     ## Camera calibration
-    def __init__(self, width=1640, height=1232, fx=1250, fy=1250, cx=None, cy=None, fps = 30):
+    def __init__(self, width=1640, height=1232, fx=1360, fy=1360, cx=None, cy=None, fps = 30):
         self.picam2 = None
         self.width = width #resultion
         self.height = height #resulution

@@ -17,7 +17,7 @@ landmarks = landmark_utils.map_landmarks()
 print(f"landmarks detected: {landmarks}")
 
 
-landmark_radius = 0.165
+landmark_radius = 0.175
 landmarks_for_grid = [(pos[0], pos[1], landmark_radius) for _, pos in landmarks]
                       
 grid_map.add_landmarks(landmarks_for_grid)

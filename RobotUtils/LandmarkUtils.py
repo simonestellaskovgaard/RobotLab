@@ -3,11 +3,9 @@ import matplotlib.pyplot as plt
 import cv2
 
 class LandmarkUtils:
-    def __init__(self, cam, aruco, cube_side=0.05, robot_radius=0.1):
+    def __init__(self, cam, aruco):
         self.cam = cam
         self.aruco = aruco
-        self.cube_side = cube_side
-        self.robot_radius = robot_radius
         self.landmarks = []
 
     def map_landmarks(self):
