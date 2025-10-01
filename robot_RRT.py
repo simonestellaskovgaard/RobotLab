@@ -162,20 +162,20 @@ class robot_RRT:
                 return False
         return True
     
-    def smooth_path(self, path, iterations=100):
-        if path is None or len(path) < 3:
-            return path  # nothing to smooth
+    #def smooth_path(self, path, iterations=100):
+    #    if path is None or len(path) < 3:
+    #        return path  # nothing to smooth
 
-        path = path.copy()
-        for _ in range(iterations):
-            i = np.random.randint(0, len(path) - 2)
-            j = np.random.randint(i + 1, len(path) - 1)
-            p1, p2 = path[i], path[j]
+    #    path = path.copy()
+    #    for _ in range(iterations):
+    #        i = np.random.randint(0, len(path) - 2)
+    #        j = np.random.randint(i + 1, len(path) - 1)
+    #        p1, p2 = path[i], path[j]
 
-            if self.is_collision_free_line(p1, p2):
-                path = path[:i+1] + [p2] + path[j+1:]
+    #        if self.is_collision_free_line(p1, p2):
+    #            path = path[:i+1] + [p2] + path[j+1:]
 
-        return path
+    #    return path/*
 
     def is_collision_free_line(self, p1, p2, path_resolution=0.05):
         p1 = np.array(p1)
