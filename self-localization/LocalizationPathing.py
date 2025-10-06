@@ -16,7 +16,7 @@ class LocalizationPathing:
         self.robot = robot
         self.camera = camera
         self.required_landmarks = set(required_landmarks)
-        self.step_m = step_cm
+        self.step_cm = step_cm
         self.rotation_deg = rotation_deg
 
         self.observed_landmarks = set()
