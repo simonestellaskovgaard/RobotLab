@@ -1,6 +1,5 @@
 import sys
 import os
-
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import particle
 import camera
@@ -16,7 +15,7 @@ import cv2
 from LandmarkOccupancyGrid import LandmarkOccupancyGrid
 
 # Flags
-showGUI = True  # Whether or not to open GUI windows
+showGUI = False  # Whether or not to open GUI windows
 onRobot = True # Whether or not we are running on the Arlo robot
 
 
