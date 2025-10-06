@@ -61,7 +61,7 @@ class LocalizationPathing:
         """
         return self.all_seen
     
-    def move_towards_goal_step(self, est_pose, center, step_m=0.2):
+    def move_towards_goal_step(self, est_pose, center, step_cm=20):
         """
         Move a single step toward the center point between landmarks.
         Updates the robot orientation slightly and moves forward a small distance.
@@ -77,7 +77,7 @@ class LocalizationPathing:
         angle_to_center = (angle_to_center + np.pi) % (2 * np.pi) - np.pi
         
         # Limit movement step to avoid overshooting
-        move_distance = min(step_m, distance_to_center)
+        move_distance = min(step_cm, distance_to_center)
 
         print(f"distance: {move_distance}")
         print(f"angle: {angle_to_center}")
