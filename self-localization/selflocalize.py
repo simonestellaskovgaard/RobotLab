@@ -286,8 +286,8 @@ try:
         # Use motor controls to update particles
         if isRunningOnArlo():
             if not pathing.seen_all_landmarks():
-                drive = random.random() < 0.5  
-                distance, angle = pathing.explore_step(drive)
+                #drive = random.random() < 0.5  
+                distance, angle = pathing.explore_step(drive = False)
             else:
                 distance, angle = pathing.move_towards_center_step(est_pose, landmarks)
         
