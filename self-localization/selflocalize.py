@@ -289,7 +289,7 @@ try:
                 #drive = random.random() < 0.5  
                 distance, angle = pathing.explore_step(drive = False)
             else:
-                distance, angle = pathing.move_towards_center_step(est_pose, landmarks)
+                distance, angle = pathing.move_towards_goal_step(est_pose, landmarks)
         
         sample_motion_model(particles, distance, angle, sigma_d, sigma_theta)
         # Fetch next frame
