@@ -157,23 +157,25 @@ def measurement_model(particle_list, landmarkIDs, dists, angles, sigma_d, sigma_
         p_observation_given_x = 1.0
 
         #p(z|x) = sum over the probability for all landmarks
+        
         for landmarkID, dist, angle in zip(landmarkIDs, dists, angles):
-            l_x, l_y = landmarks[landmarkID]
-            d_i = np.sqrt((l_x - x_i)**2 + (l_y - y_i)**2)
+            if landmarkID in landmarkIDs:
+                l_x, l_y = landmarks[landmarkID]
+                d_i = np.sqrt((l_x - x_i)**2 + (l_y - y_i)**2)
 
-            p_d_m = norm.pdf(dist, loc=d_i, scale=sigma_d)
+                p_d_m = norm.pdf(dist, loc=d_i, scale=sigma_d)
 
-            e_theta = np.array([np.cos(theta_i), np.sin(theta_i)])
-            e_theta_hat = np.array([-np.sin(theta_i), np.cos(theta_i)])
+                e_theta = np.array([np.cos(theta_i), np.sin(theta_i)])
+                e_theta_hat = np.array([-np.sin(theta_i), np.cos(theta_i)])
 
-            e_l = np.array([l_x - x_i, l_y - y_i]) / d_i
+                e_l = np.array([l_x - x_i, l_y - y_i]) / d_i
 
-            phi_i = np.sign(np.dot(e_l, e_theta_hat)) * np.arccos(np.dot(e_l, e_theta))
-            
-            p_phi_m = norm.pdf(angle,loc=phi_i, scale=sigma_theta)
+                phi_i = np.sign(np.dot(e_l, e_theta_hat)) * np.arccos(np.dot(e_l, e_theta))
+                
+                p_phi_m = norm.pdf(angle,loc=phi_i, scale=sigma_theta)
 
 
-            p_observation_given_x *= p_d_m* p_phi_m
+                p_observation_given_x *= p_d_m* p_phi_m
 
         particle.setWeight(p_observation_given_x)
 
@@ -242,6 +244,9 @@ try:
     alpha_slow = 1
     alpha_fast = 1
 
+    rotation_counter = 0
+    drive = False
+
     #Initialize the robot
     if isRunningOnArlo():
         arlo = CalibratedRobot()
@@ -290,8 +295,11 @@ try:
         # Use motor controls to update particles
         if isRunningOnArlo():
             if not pathing.seen_all_landmarks():
-                #drive = random.random() < 0.5  
-                distance, angle = pathing.explore_step(drive = False)
+                rotation_counter += 1
+                if rotation_counter == 18:
+                    drive = True
+                    rotation_counter = 0
+                distance, angle = pathing.explore_step(drive)
             else:
                 distance, angle = pathing.move_towards_goal_step(est_pose, center)
         

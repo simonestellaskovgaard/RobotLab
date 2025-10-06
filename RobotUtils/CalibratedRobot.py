@@ -64,13 +64,13 @@ class CalibratedRobot:
             time.sleep(duration)
             self.arlo.stop()
             
-    def forward_proximity_check(self, center_dist = 0, left_dist = 0, right_dist = 0):
+    def proximity_check(self):
         left = self.arlo.read_left_ping_sensor()
         center = self.arlo.read_front_ping_sensor()
         right = self.arlo.read_right_ping_sensor()
-        if center < center_dist or left < left_dist or right < right_dist:
-            self.arlo.stop()
-
+        
+        return  left, center, right
+    
     def follow_path(self, path, start_orientation=np.array([0, 1])):
         orientation_unit = start_orientation / np.linalg.norm(start_orientation)
 

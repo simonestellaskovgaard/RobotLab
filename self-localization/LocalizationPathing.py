@@ -12,7 +12,7 @@ class LocalizationPathing:
     Allows step-by-step exploration while tracking which landmarks have been seen.
     """
 
-    def __init__(self, robot, camera, required_landmarks, step_cm=20, rotation_deg=15):
+    def __init__(self, robot, camera, required_landmarks, step_cm=20, rotation_deg=20):
         self.robot = robot
         self.camera = camera
         self.required_landmarks = set(required_landmarks)
@@ -22,24 +22,33 @@ class LocalizationPathing:
         self.observed_landmarks = set()
         self.all_seen = False
 
-    def explore_step(self, drive = False):
-        """
-        Moves the robot one step forward and rotates slightly.
-        Updates the set of observed landmarks and all_seen flag.
-        """
+    def explore_step(self, drive=False, min_dist = 400):
         dist = 0
-        angle = self.rotation_deg
+        angle_deg = self.rotation_deg  # degrees
+        angle_rad = np.radians(angle_deg)  # radians
 
         if self.all_seen:
-            return  0, 0 # Already done
+            return 0, 0  # Already done
 
         # Rotate slightly
-        self.robot.turn_angle(self.rotation_deg)
-        time.sleep(0.2)
-        
+        if not drive:
+            self.robot.turn_angle(angle_deg)
+            time.sleep(0.2)
+
         # Move forward
         if drive:
             dist = self.step_cm
+            left, center, right = self.robot.proximity_check()
+            # Example proximity logic (assuming left, center, right are defined earlier)
+            if left < min_dist or center < min_dist or right < min_dist:
+                self.robot.stop()
+            if left > right:
+                self.robot.turn_angle(45)   # turn left
+                angle_rad = np.radians(45)
+            else:
+                self.robot.turn_angle(-45)  # turn right
+                angle_rad = np.radians(-45)
+
             self.robot.drive_distance_cm(dist)
 
         # Capture image and detect landmarks
@@ -51,8 +60,8 @@ class LocalizationPathing:
         # Update boolean
         self.all_seen = self.required_landmarks.issubset(self.observed_landmarks)
 
-        return dist, angle
-        
+        # Return values for particle filter: distance in cm, angle in radians
+        return dist, angle_rad
 
 
     def seen_all_landmarks(self):
@@ -72,6 +81,10 @@ class LocalizationPathing:
         direction = center - robot_pos
         distance_to_center = np.linalg.norm(direction)
         angle_to_center = np.arctan2(direction[1], direction[0]) - est_pose.getTheta()
+
+        if distance_to_center < 5:
+            print("reached center")
+            return 0, 0
         
         # Normalize angle to [-pi, pi]
         angle_to_center = (angle_to_center + np.pi) % (2 * np.pi) - np.pi
@@ -87,6 +100,8 @@ class LocalizationPathing:
         
         # Move a small step forward
         self.robot.drive_distance_cm(move_distance)
+
+
 
         # Return distance and angle in radians for particle update
         return move_distance, angle_to_center
