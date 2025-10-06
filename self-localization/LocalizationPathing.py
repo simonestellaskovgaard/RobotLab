@@ -61,7 +61,7 @@ class LocalizationPathing:
         """
         return self.all_seen
     
-    def move_towards_goal_step(self, est_pose, center, step_cm=20):
+    def move_towards_goal_step(self, est_pose, center, step_cm=100):
         """
         Move a single step toward the center point between landmarks.
         Updates the robot orientation slightly and moves forward a small distance.
