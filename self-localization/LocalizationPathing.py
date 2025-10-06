@@ -35,7 +35,7 @@ class LocalizationPathing:
 
         # Rotate slightly
         self.robot.turn_angle(self.rotation_deg)
-        time.sleep(0.4)
+        time.sleep(0.2)
         
         # Move forward
         if drive:
