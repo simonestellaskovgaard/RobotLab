@@ -75,7 +75,7 @@ class LocalizationPathing:
         
         # Normalize angle to [-pi, pi]
         angle_to_center = (angle_to_center + np.pi) % (2 * np.pi) - np.pi
-        angle_degrees = np.degress(angle_to_center)
+        angle_degrees = np.degrees(angle_to_center)
         
         # Limit movement step to avoid overshooting
         move_distance = min(step_cm, distance_to_center)
