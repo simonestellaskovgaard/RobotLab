@@ -49,6 +49,10 @@ landmarks = {
     7: (300.0, 0.0)  # Coordinates for landmark 2
 }
 
+center = np.array([(landmarks[6][0] + landmarks[7][0]) / 2,
+                   (landmarks[6][1] + landmarks[7][1]) / 2])
+
+
 
 landmark_colors = [CRED, CGREEN] # Colors used when drawing the landmarks
 
@@ -289,7 +293,7 @@ try:
                 #drive = random.random() < 0.5  
                 distance, angle = pathing.explore_step(drive = False)
             else:
-                distance, angle = pathing.move_towards_goal_step(est_pose, landmarks)
+                distance, angle = pathing.move_towards_goal_step(est_pose, center)
         
         sample_motion_model(particles, distance, angle, sigma_d, sigma_theta)
         # Fetch next frame

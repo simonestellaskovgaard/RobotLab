@@ -61,14 +61,11 @@ class LocalizationPathing:
         """
         return self.all_seen
     
-    def move_towards_goal_step(self, est_pose, landmarks, step_m=0.2):
+    def move_towards_goal_step(self, est_pose, center, step_m=0.2):
         """
         Move a single step toward the center point between landmarks.
         Updates the robot orientation slightly and moves forward a small distance.
         """
-        # Compute center
-        center = np.array([(landmarks[1][0] + landmarks[2][0]) / 2,
-                           (landmarks[1][1] + landmarks[2][1]) / 2])
         
         # Compute direction vector
         robot_pos = np.array([est_pose.getX(), est_pose.getY()])
