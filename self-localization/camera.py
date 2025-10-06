@@ -236,7 +236,7 @@ class Camera(object):
             if not self.cam.isOpened(): # Did not work
 
                 # We try first the generic auto-detect interface
-                self.cam = cv2.VideoCapture(camidx)
+                self.cam = cv2.VideoCapture(camidx, cv2.CAP_V4L2)
                 #print(self.cam.getBackendName())
                 if not self.cam.isOpened():  # Error
                     print("Camera.__init__: Could not open camera")

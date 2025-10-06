@@ -10,8 +10,6 @@ class LandmarkUtils:
 
     def map_landmarks(self):
         frame = self.cam.get_frame()
-        cv2.imwrite("frame.png", cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
-        plt.imsave("frame.png", frame)
         corners, ids = self.aruco.detect_markers(frame)
         self.landmarks = []
 

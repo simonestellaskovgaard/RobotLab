@@ -157,10 +157,15 @@ class robot_RRT:
     def check_collision_free(self, node):
         if node is None:
             return False
-        for p in node.path:
-            if self.map.robot_collision(np.array(p), self.robot.robot_radius):
+        path = node.path
+        for i in range(len(path) - 1):
+            p1 = np.array(path[i])
+            p2 = np.array(path[i+1])
+            heading = np.arctan2(p2[1] - p1[1], p2[0] - p1[0])
+            if self.map.robot_collision(p1, self.robot.robot_radius, heading):
                 return False
         return True
+
     
     def smooth_path(self, path, iterations=100):
         if path is None or len(path) < 3:
@@ -182,10 +187,12 @@ class robot_RRT:
         p2 = np.array(p2)
         dist = np.linalg.norm(p2 - p1)
         n_steps = int(dist / path_resolution)
+        heading = np.arctan2(p2[1] - p1[1], p2[0] - p1[0])  # compute heading once
+
         for i in range(n_steps + 1):
             interp = p1 + (p2 - p1) * (i / n_steps)
-            if self.map.robot_collision(interp, self.robot.robot_radius):
+            if self.map.robot_collision(interp, self.robot.robot_radius, heading):
                 return False
         return True
-    
+
 

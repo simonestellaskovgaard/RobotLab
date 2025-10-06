@@ -1,40 +1,36 @@
-import cv2
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import particle
 import camera
 import numpy as np
 import time
 from timeit import default_timer as timer
-import sys
 from RobotUtils.CalibratedRobot import CalibratedRobot
-import norm
+from scipy.stats import norm
 import math
+from LocalizationPathing import LocalizationPathing
+import random
+import cv2
+from LandmarkOccupancyGrid import LandmarkOccupancyGrid
 
 # Flags
 showGUI = True  # Whether or not to open GUI windows
-onRobot = True  # Whether or not we are running on the Arlo robot
+onRobot = True # Whether or not we are running on the Arlo robot
 
 
 def isRunningOnArlo():
     """Return True if we are running on Arlo, otherwise False.
-      You can use this flag to switch the code from running on you laptop to Arlo - you need to do the programming here!
+    You can use this flag to switch the code from running on you laptop to Arlo - you need to do the programming here!
     """
     return onRobot
 
-
-if isRunningOnArlo():
-    # XXX: You need to change this path to point to where your robot.py file is located
-    sys.path.append("../../../../Arlo/python")
-
-
 try:
-    import robot
-    onRobot = True
+    from RobotUtils.Robot import Robot
 except ImportError:
     print("selflocalize.py: robot module not present - forcing not running on Arlo!")
     onRobot = False
-
-
-
 
 # Some color constants in BGR format
 CRED = (0, 0, 255)
@@ -48,11 +44,13 @@ CBLACK = (0, 0, 0)
 
 # Landmarks.
 # The robot knows the position of 2 landmarks. Their coordinates are in the unit centimeters [cm].
-landmarkIDs = [1, 2]
+landmarkIDs = [6, 7]
 landmarks = {
-    1: (0.0, 0.0),  # Coordinates for landmark 1
-    2: (300.0, 0.0)  # Coordinates for landmark 2
+    6: (0.0, 0.0),  # Coordinates for landmark 1
+    7: (300.0, 0.0)  # Coordinates for landmark 2
 }
+
+
 landmark_colors = [CRED, CGREEN] # Colors used when drawing the landmarks
 
 def jet(x):
@@ -89,7 +87,7 @@ def draw_world(est_pose, particles, world):
         colour = jet(particle.getWeight() / max_weight)
         cv2.circle(world, (x,y), 2, colour, 2)
         b = (int(particle.getX() + 15.0*np.cos(particle.getTheta()))+offsetX, 
-                                     ymax - (int(particle.getY() + 15.0*np.sin(particle.getTheta()))+offsetY))
+                                    ymax - (int(particle.getY() + 15.0*np.sin(particle.getTheta()))+offsetY))
         cv2.line(world, (x,y), b, colour, 2)
 
     # Draw landmarks
@@ -101,7 +99,7 @@ def draw_world(est_pose, particles, world):
     # Draw estimated robot pose
     a = (int(est_pose.getX())+offsetX, ymax-(int(est_pose.getY())+offsetY))
     b = (int(est_pose.getX() + 15.0*np.cos(est_pose.getTheta()))+offsetX, 
-         ymax-(int(est_pose.getY() + 15.0*np.sin(est_pose.getTheta()))+offsetY))
+        ymax-(int(est_pose.getY() + 15.0*np.sin(est_pose.getTheta()))+offsetY))
     cv2.circle(world, a, 5, CMAGENTA, 2)
     cv2.line(world, a, b, CMAGENTA, 2)
 
@@ -116,16 +114,38 @@ def initialize_particles(num_particles):
 
     return particles
 
-def sample_motion_model(particle_list, velocity, angular_velocity, sigma_d=2, sigma_theta=0.05):
-    for p in particle_list:
-       
-        p.move_particle(p, delta_x, delta_y, delta_theta)
+def sample_motion_model(particles_list, distance, angle, sigma_d, sigma_theta):
+    for p in particles_list:
+        delta_x = distance * np.cos(p.getTheta() + angle)
+        delta_y = distance * np.sin(p.getTheta() + angle)
+        # Apply motion update
+        particle.move_particle(p, delta_x, delta_y, angle)
+
+    # Add motion noise
+    particle.add_uncertainty_von_mises(particles_list, sigma_d, sigma_theta)
+
+def motion_model_with_map(particle, distance, angle, sigma_d, sigma_theta, grid):
+    indices, valid = grid.world_to_grid([particle.getX(), particle.getY()])
+
+    p_map = 0 if (not valid or grid.in_collision(indices)) else 1
+    if p_map:
+        sample_motion_model([particle], distance, angle, sigma_d, sigma_theta)
+        return 1
     
-    particle.add_uncertainty(particle_list, sigma_d, sigma_theta)
+    return 0
+
+def sample_motion_model_with_map(particles_list, distance, angle, sigma_d, sigma_theta, grid, max_tries=10):
+    for p in particles_list:
+        for attempt in range(max_tries):
+            pi = motion_model_with_map(p, distance, angle, sigma_d, sigma_theta, grid)
+            if pi > 0:
+                break
+        else:
+            # fallback: particle couldn't move without collision
+            p.setWeight(0.01)  # very low weight to indicate invalid
 
 
-
-def measurement_model(particle_list, landmarkIDs, dists, angles, sigma_d = 20, sigma_theta = 20):
+def measurement_model(particle_list, landmarkIDs, dists, angles, sigma_d, sigma_theta):
     for particle in particle_list:
         x_i = particle.getX()
         y_i = particle.getY()
@@ -154,20 +174,38 @@ def measurement_model(particle_list, landmarkIDs, dists, angles, sigma_d = 20, s
 
         particle.setWeight(p_observation_given_x)
 
-def resample_particles(particle_list):
-    weights = np.array([p.getWeight() for p in particles])
-    weights /= np.sum(weights)
-
-    cdf = np.sum(weights)
+def resample_particles(particle_list, weights, w_fast, w_slow):
+    cdf = np.cumsum(weights)
 
     resampled = []
     for _ in range(len(particle_list)):
-        z = np.random.rand()
-        idx = np.searchsorted(cdf, z)
-        p_resampled = particle(particles[idx].getX(), particles[idx].getY(), particles[idx].getTheta(), 1.0/(len(particle_list)))
-        resampled.append(p_resampled)
+        if random.random() < max(0.0, 1.0 - w_fast /w_slow):
+            p = initialize_particles(1)[0]
+            resampled.append(p)
+        else:
+            z = np.random.rand()
+            idx = np.searchsorted(cdf, z)
+            p_resampled = particle.Particle(particle_list[idx].getX(), particle_list[idx].getY(), particle_list[idx].getTheta(), 1.0/(len(particle_list)))
+            resampled.append(p_resampled)
 
     return resampled
+
+
+def filter_landmarks_by_distance(objectIDs, dists, angles):
+    """
+    Keep only the measurement at the smallest distance for each landmark ID.
+    """
+    min_dist_dict = {}  # dict: landmarkID -> (dist, angle)
+
+    for id, d, a in zip(objectIDs, dists, angles):
+        if id not in min_dist_dict or d < min_dist_dict[id][0]:
+            min_dist_dict[id] = (d, a)
+
+    filtered_ids = list(min_dist_dict.keys())
+    filtered_dists = [min_dist_dict[ID][0] for ID in filtered_ids]
+    filtered_angles = [min_dist_dict[ID][1] for ID in filtered_ids]
+
+    return filtered_ids, filtered_dists, filtered_angles
 
 # Main program #
 try:
@@ -187,14 +225,28 @@ try:
     particles = initialize_particles(num_particles)
 
     est_pose = particle.estimate_pose(particles) # The estimate of the robots current pose
+    print(f"estimated pose: {est_pose}")
 
     # Driving parameters
-    velocity = 0.0 # cm/sec
-    angular_velocity = 0.0 # radians/sec
+    distance = 0.0 # distance driven at this time step
+    angle = 0.0 # angle turned at this timestep
 
-    # Initialize the robot (XXX: You do this)
-    if isRunningOnArlo:
+    sigma_d = 10
+    sigma_theta = 0.2
+
+    w_slow = 0.0
+    w_fast = 0.0
+    alpha_slow = 1
+    alpha_fast = 1
+
+    #Initialize the robot
+    if isRunningOnArlo():
         arlo = CalibratedRobot()
+
+    #grid = LandmarkOccupancyGrid([-100, -250], (400, 250))
+    #landmark_list = [(x, y, 20.0) for x, y in landmarks.values()]
+    #grid.add_landmarks(landmark_list)
+
 
     # Allocate space for world map
     world = np.zeros((500,500,3), dtype=np.uint8)
@@ -205,10 +257,11 @@ try:
     print("Opening and initializing camera")
     if isRunningOnArlo():
         #cam = camera.Camera(0, robottype='arlo', useCaptureThread=True)
-        cam = camera.Camera(0, robottype='arlo', useCaptureThread=False)
+        cam = camera.Camera(1, robottype='arlo', useCaptureThread=False)
+        pathing = LocalizationPathing(arlo, cam, landmarkIDs)
     else:
         #cam = camera.Camera(0, robottype='macbookpro', useCaptureThread=True)
-        cam = camera.Camera(1, robottype='macbookpro', useCaptureThread=False)
+        cam = camera.Camera(0, robottype='macbookpro', useCaptureThread=False)
 
     while True:
         # Move the robot according to user input (only for testing)
@@ -217,41 +270,57 @@ try:
             break
     
         if not isRunningOnArlo():
-            if action == ord('w'): # Forward
-                velocity += 4.0
-            elif action == ord('x'): # Backwards
-                velocity -= 4.0
-            elif action == ord('s'): # Stop
-                velocity = 0.0
-                angular_velocity = 0.0
-            elif action == ord('a'): # Left
-                angular_velocity += 0.2
-            elif action == ord('d'): # Right
-                angular_velocity -= 0.2
+            if action == ord('w'):
+                distance = 10.0
+            elif action == ord('x'):
+                distance = -10.0
+            elif action == ord('a'):
+                angle = 0.2
+            elif action == ord('d'):
+                angle = -0.2
+            else:
+                # stop if no key pressed
+                distance = 0
+                angle = 0
 
 
         # Use motor controls to update particles
-        sample_motion_model(particles, velocity, angular_velocity)
+        if isRunningOnArlo():
+            if not pathing.seen_all_landmarks():
+                drive = random.random() < 0.5  
+                distance, angle = pathing.explore_step(drive)
+            else:
+                distance, angle = pathing.move_towards_center_step(est_pose, landmarks)
         
+        sample_motion_model(particles, distance, angle, sigma_d, sigma_theta)
         # Fetch next frame
         colour = cam.get_next_frame()
         
         # Detect objects
         objectIDs, dists, angles = cam.detect_aruco_objects(colour)
         if not isinstance(objectIDs, type(None)):
+            objectIDs, dists, angles = filter_landmarks_by_distance(objectIDs, dists, angles)
             # List detected objects
             for i in range(len(objectIDs)):
                 print("Object ID = ", objectIDs[i], ", Distance = ", dists[i], ", angle = ", angles[i])
-                # XXX: Do something for each detected object - remember, the same ID may appear several times
 
             # Compute particle weights
-            measurement_model(particles, objectIDs, dists, angles)
+            measurement_model(particles, objectIDs, dists, angles, sigma_d, sigma_theta)
+
+            weights = np.array([p.getWeight() for p in particles])
+
+            w_avg = np.mean(weights)
+            w_slow += alpha_slow * (w_avg - w_slow)
+            w_fast += alpha_fast * (w_avg - w_fast)
+
+            weights /= np.sum(weights)
 
             # Resampling
-            particles = resample_particles(particles)
+            particles = resample_particles(particles, weights, w_fast, w_slow)
 
             # Draw detected objects
             cam.draw_aruco_objects(colour)
+            
         else:
             # No observation - reset weights to uniform distribution
             for p in particles:
@@ -270,7 +339,7 @@ try:
             # Show world
             cv2.imshow(WIN_World, world)
     
-  
+
 finally: 
     # Make sure to clean up even if an exception occurred
     

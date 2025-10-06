@@ -13,6 +13,21 @@ class LandmarkOccupancyGrid:
 
         self.extent = [self.map_area[0][0], self.map_area[1][0], self.map_area[0][1], self.map_area[1][1]]
 
+    def world_to_grid(self, pos):
+        """
+        Convert a position in world coordinates (x, y) to grid indices [i, j].
+        Returns (indices, valid), where valid is False if outside the map.
+        """
+        i = int((pos[0] - self.map_area[0][0]) // self.resolution)
+        j = int((pos[1] - self.map_area[0][1]) // self.resolution)
+
+        valid = True
+        if i < 0 or i >= self.n_grids[0] or j < 0 or j >= self.n_grids[1]:
+            valid = False
+
+        return [i, j], valid
+
+
     def in_collision(self, indices):
         """
         find if the position is occupied or not. return if the queried pos is outside the map
@@ -23,26 +38,31 @@ class LandmarkOccupancyGrid:
         
         return self.grid[indices[0], indices[1]] 
     
-    def robot_collision(self, pos, r_robot):
+    def robot_collision(self, camera_pos, r_robot, heading = 0):
         """
         Checks if a robot with radius r_robot at position (x, y) collides with an obstacle
         """
-        indices = [
-        int((pos[0] - self.map_area[0][0]) // self.resolution),
-        int(((pos[1] -r_robot) - self.map_area[0][1]) // self.resolution)
-        ]
+        if heading is not None:
+            center_pos = [
+                camera_pos[0] - r_robot * np.cos(heading),
+                camera_pos[1] - r_robot * np.sin(heading)
+            ]
+        else:
+            center_pos = [camera_pos[0], camera_pos[1] - r_robot]
 
+        indices = [
+            int((center_pos[0] - self.map_area[0][0]) // self.resolution),
+            int((center_pos[1] - self.map_area[0][1]) // self.resolution)
+        ]
 
         cell_radius = int(np.ceil(r_robot / self.resolution))
 
         for dx in range(-cell_radius, cell_radius + 1):
             for dy in range(-cell_radius, cell_radius + 1):
                 neighbor_indices = [indices[0] + dx, indices[1] + dy]
-                
                 if self.in_collision(neighbor_indices):
-                    return 1  
-        
-        return 0  
+                    return 1
+        return 0
 
 
     def add_landmarks(self, landmarks):
@@ -66,7 +86,4 @@ class LandmarkOccupancyGrid:
     
     def draw_map(self, robot_radius=None):
         plt.imshow(self.grid.T, cmap="Greys", origin='lower', vmin=0, vmax=1, extent=self.extent, interpolation='none')
-        if robot_radius is not None:
-            circle = plt.Circle((0,0), robot_radius, color='blue', alpha=0.5, label='Robot')
-            plt.gca().add_patch(circle)
 

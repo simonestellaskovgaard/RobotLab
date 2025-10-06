@@ -1,45 +1,44 @@
-import cv2  # Import the OpenCV library
+import cv2
 import numpy as np
 
+markerID = 2 # Change as needed
 
-# TODO make this configurable from the command line using parser
-markerID = 20 # Try 1 - 4
+# Constants
+ppi = 72
+inch2mm = 25.4
+ppmm = ppi / inch2mm
 
-# Define some relevant constants
-ppi = 72  # dots (pixels) per inch [inch^(-1)]
-inch2mm = 25.4  # [mm / inch]
-ppmm = ppi / inch2mm  # Dots per mm [mm^(-1)]
+a4width = 210.0
+a4height = 297.0
 
-# Define size of output image to fit A4 paper
-a4width = 210.0  # [mm]
-a4height = 297.0  # [mm]
+width = int(np.round(a4width * ppmm))
+height = int(np.round(a4height * ppmm))
 
-# Size of output image
-width = np.uint(np.round(a4width * ppmm))  # [pixels]
-height = np.uint(np.round(a4height * ppmm))  # [pixels]
+markerPhysicalSize = 150
+markerSize = int(np.round(markerPhysicalSize * ppmm))
 
-# Size of ArUco marker
-markerPhysicalSize = 150  # [mm]
-markerSize = np.uint(np.round(markerPhysicalSize * ppmm))  # [pixels]
+# White A4 image
+landmarkImage = np.ones((height, width), dtype=np.uint8) * 255
 
-# Create landmark image (all white gray scale image)
-#landmarkImage = np.ones((width, height), dtype=np.uint8) * np.uint8(255)
-landmarkImage = np.ones((height, width), dtype=np.uint8) * np.uint8(255)
-
-# Initialize the ArUco dictionary
+# ArUco dictionary
 arucoDict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
 
-# Draw marker in the center
-startWidth = int(np.round((width-markerSize)/2))
-startHeight = int(np.round((height-markerSize)/2))
-landmarkImage[startHeight:int(startHeight+markerSize), startWidth:int(startWidth+markerSize)] = cv2.aruco.drawMarker(arucoDict, markerID, markerSize, 1)
-cv2.putText(landmarkImage, str(markerID), (startWidth, startHeight - 60), cv2.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,0), 2)
+# Generate marker (new API)
+markerImage = np.zeros((markerSize, markerSize), dtype=np.uint8)
+cv2.aruco.generateImageMarker(arucoDict, markerID, markerSize, markerImage, 1)
 
+# Center marker
+startWidth = int(np.round((width - markerSize) / 2))
+startHeight = int(np.round((height - markerSize) / 2))
+landmarkImage[startHeight:startHeight+markerSize, startWidth:startWidth+markerSize] = markerImage
 
-# Save image
-cv2.imwrite("../../../data/landmark" + str(markerID) + ".png", landmarkImage)
+# Add marker ID text
+cv2.putText(landmarkImage, str(markerID),
+            (startWidth, startHeight - 60),
+            cv2.FONT_HERSHEY_SIMPLEX, 2.0, (0, 0, 0), 2)
 
-# Show image
-cv2.namedWindow("Landmark")
+# Save and show
+cv2.imwrite(f"landmark{markerID}.png", landmarkImage)
 cv2.imshow("Landmark", landmarkImage)
 cv2.waitKey()
+cv2.destroyAllWindows()

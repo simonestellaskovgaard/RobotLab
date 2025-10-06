@@ -44,6 +44,11 @@ class CalibratedRobot:
         time.sleep(duration)
         self.arlo.stop()
 
+    def drive_distance_cm(self, distance_cm, direction=None, speed=None):
+        """Wrapper: convert cm to meters for the robot API"""
+        distance_m = distance_cm / 100.0
+        self.drive_distance(distance_m, direction, speed)
+
     def turn_angle(self, angleDeg, speed=None):
         """Turn a given angle in degrees at a given speed. Positive = left, negative = right."""
         if speed is None:

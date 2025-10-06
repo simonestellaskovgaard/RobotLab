@@ -65,7 +65,7 @@ def estimate_pose(particles_list):
 def move_particle(particle, delta_x, delta_y, delta_theta):
     particle.x += + delta_x
     particle.y += delta_y
-    new_theta += delta_theta
+    new_theta = particle.getTheta() + delta_theta
 
     particle.theta = np.mod(new_theta, 2.0 * np.pi)
 
