@@ -121,10 +121,9 @@ def sample_motion_model(particles_list, distance, angle, sigma_d, sigma_theta):
     for p in particles_list:
         delta_x = distance * np.cos(p.getTheta() + angle)
         delta_y = distance * np.sin(p.getTheta() + angle)
-        # Apply motion update
+    
         particle.move_particle(p, delta_x, delta_y, angle)
 
-    # Add motion noise
     particle.add_uncertainty_von_mises(particles_list, sigma_d, sigma_theta)
 
 def motion_model_with_map(particle, distance, angle, sigma_d, sigma_theta, grid):
@@ -144,8 +143,8 @@ def sample_motion_model_with_map(particles_list, distance, angle, sigma_d, sigma
             if pi > 0:
                 break
         else:
-            # fallback: particle couldn't move without collision
-            p.setWeight(0.01)  # very low weight to indicate invalid
+            # fallback
+            p.setWeight(0.01)  # low weight to indicate invalid
 
 
 def measurement_model(particle_list, landmarkIDs, dists, angles, sigma_d, sigma_theta):
@@ -157,7 +156,6 @@ def measurement_model(particle_list, landmarkIDs, dists, angles, sigma_d, sigma_
         p_observation_given_x = 1.0
 
         #p(z|x) = sum over the probability for all landmarks
-        
         for landmarkID, dist, angle in zip(landmarkIDs, dists, angles):
             if landmarkID in landmarkIDs:
                 l_x, l_y = landmarks[landmarkID]
@@ -244,9 +242,6 @@ try:
     alpha_slow = 1
     alpha_fast = 1
 
-    rotation_counter = 0
-    drive = False
-
     #Initialize the robot
     if isRunningOnArlo():
         arlo = CalibratedRobot()
@@ -291,18 +286,18 @@ try:
                 distance = 0
                 angle = 0
 
-
         # Use motor controls to update particles
         if isRunningOnArlo():
             if not pathing.seen_all_landmarks():
-                rotation_counter += 1
-                if rotation_counter == 18:
-                    drive = True
-                    rotation_counter = 0
+                drive = random.random() < (1/18)
                 distance, angle = pathing.explore_step(drive)
             else:
-                distance, angle = pathing.move_towards_goal_step(est_pose, center)
-        
+                if stabilization_counter < 2:
+                    stabilization_counter += 1
+                    distance, angle = 0, 0
+                else:
+                    distance, angle = pathing.move_towards_goal_step(est_pose, center)
+                    
         sample_motion_model(particles, distance, angle, sigma_d, sigma_theta)
         # Fetch next frame
         colour = cam.get_next_frame()
