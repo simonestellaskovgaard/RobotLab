@@ -285,7 +285,8 @@ try:
                 # stop if no key pressed
                 distance = 0
                 angle = 0
-
+                
+        stabilization_counter = 0
         # Use motor controls to update particles
         if isRunningOnArlo():
             if not pathing.seen_all_landmarks():
