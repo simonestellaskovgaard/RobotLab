@@ -262,6 +262,7 @@ try:
         #cam = camera.Camera(0, robottype='arlo', useCaptureThread=True)
         cam = camera.Camera(1, robottype='arlo', useCaptureThread=False)
         pathing = LocalizationPathing(arlo, cam, landmarkIDs)
+        stabilization_counter = 0
     else:
         #cam = camera.Camera(0, robottype='macbookpro', useCaptureThread=True)
         cam = camera.Camera(0, robottype='macbookpro', useCaptureThread=False)
@@ -286,7 +287,7 @@ try:
                 distance = 0
                 angle = 0
                 
-        stabilization_counter = 0
+       
         # Use motor controls to update particles
         if isRunningOnArlo():
             if not pathing.seen_all_landmarks():
