@@ -234,7 +234,7 @@ try:
     distance = 0.0 # distance driven at this time step
     angle = 0.0 # angle turned at this timestep
 
-    sigma_d = 10
+    sigma_d = 7
     sigma_theta = 0.2
 
     w_slow = 0.0
@@ -286,7 +286,8 @@ try:
                 # stop if no key pressed
                 distance = 0
                 angle = 0
-
+                
+        stabilization_counter = 0
         # Use motor controls to update particles
         if isRunningOnArlo():
             if not pathing.seen_all_landmarks():
